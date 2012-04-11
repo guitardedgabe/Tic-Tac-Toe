@@ -2,12 +2,10 @@ class TicTacToe:
 
 	""" Create an instance of the board, set up legal positions for playing, and define the win scenarios """
 	def __init__(self):
-		self.board = []
+		self.board = self.newBoard()
 		self.printWelcome()
 		self.plausibleAnswers = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
 		self.wins = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [2, 4, 6], [0, 3, 6], [1, 4, 7], [2, 5, 8]]
-		for i in range(0, 9):
-			self.board.append("-")
 	
 	""" Method to start the game """
 	def play(self):
@@ -18,7 +16,15 @@ class TicTacToe:
 				""" Checks to see if the position is available """
 				if self.available(answer):
 					self.makeMove("human", answer)
-				else:
+					if self.winner():
+						answer = raw_input("Winner! Want to play again? (y/n) ")
+						if 'y' in answer:
+							self.board = self.newBoard()
+							self.play()
+						else:
+							print "Goodbye"
+							exit(0)
+				elif not self.available(answer):
 					print "That spot is already taken."
 			else:
 				print "Illegal move."
@@ -26,6 +32,14 @@ class TicTacToe:
 			answer = raw_input("Next move? ")
 
 		print "Goodbye"
+	
+	""" Method to create a new board """
+	def newBoard(self):
+		board = []
+		for i in range(0, 9):
+			board.append("-")
+
+		return board
 
 	""" Method for printing the current state of the board """
 	def printBoard(self):
@@ -38,10 +52,25 @@ class TicTacToe:
 		position = int(position)
 		if player == "human":
 			self.board[position] = 'x'
-		else:
+		elif player == 'cpu':
 			self.board[position] = 'o'
 
 		self.printBoard()
+	
+	""" Method for checking to see if a player has won. Uses the self.wins list """
+	def winner(self):
+		for win in self.wins:
+			x_count = 0
+			o_count = 0
+			for i in win:
+				if self.board[i] == 'x':
+					x_count += 1
+				elif self.board[i] == 'o':
+					o_count += 1
+			if x_count == 3 or o_count == 3:
+				return True
+
+		return False
 	
 	""" Check the availability of a position on the board """
 	def available(self, position):
